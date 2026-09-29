@@ -47,6 +47,23 @@
   </main>
 
   <footer>© 2026 Connect. Built with HTML, CSS & JavaScript.</footer>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const connectSupabase = window.supabase.createClient(
+      "https://fymalafgyoiwjxbkkmta.supabase.co",
+      "sb_publishable_BONoTx6NCnML5GL_GGriGQ_XT2Rb1i2"
+    );
+    connectSupabase.auth.getUser().then(({ data }) => {
+      if (data.user) {
+        const nav = document.querySelector(".nav nav");
+        const start = document.querySelector("#get-started");
+        const username = data.user.user_metadata?.username || "Account";
+        if (nav) nav.querySelector(".nav-button").outerHTML = '<a class="nav-button" href="app.html">' + username + '</a>';
+        if (start) start.querySelector(".primary").textContent = "Open Connect";
+        if (start) start.querySelector(".primary").href = "app.html";
+      }
+    });
+  </script>
   <script src="js/main.js"></script>
 </body>
 </html>

@@ -11,6 +11,8 @@ function showMessage(text, type = "error") {
 if (form) {
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
+    event.stopPropagation();
+    showMessage("Creating your account…", "success");
     const button = form.querySelector("button[type='submit']");
     button.disabled = true;
 

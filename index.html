@@ -53,14 +53,37 @@
       "https://fymalafgyoiwjxbkkmta.supabase.co",
       "sb_publishable_BONoTx6NCnML5GL_GGriGQ_XT2Rb1i2"
     );
+
     connectSupabase.auth.getUser().then(({ data }) => {
-      if (data.user) {
-        const nav = document.querySelector(".nav nav");
-        const start = document.querySelector("#get-started");
-        const username = data.user.user_metadata?.username || "Account";
-        if (nav) nav.querySelector(".nav-button").outerHTML = '<a class="nav-button" href="app.html">' + username + '</a>';
-        if (start) start.querySelector(".primary").textContent = "Open Connect";
-        if (start) start.querySelector(".primary").href = "app.html";
+      const user = data.user;
+      const nav = document.querySelector(".nav nav");
+      const startButton = document.querySelector("#get-started .primary");
+
+      if (user) {
+        const username = user.user_metadata?.username || "Account";
+        nav.querySelector(".nav-button").textContent = username;
+        nav.querySelector(".nav-button").href = "#account";
+        startButton.textContent = "My Account";
+        startButton.href = "#account";
+
+        const account = document.createElement("section");
+        account.id = "account";
+        account.className = "features";
+        account.innerHTML = `
+          <article>
+            <strong>👤</strong>
+            <h2>${username}</h2>
+            <p>${user.email}</p>
+            <button class="button secondary" id="sign-out-home" type="button">Sign Out</button>
+          </article>
+          <article><strong>💬</strong><h2>Messages</h2><p>Direct messaging is coming next.</p></article>
+          <article><strong>👥</strong><h2>Friends</h2><p>Friend connections are coming next.</p></article>
+        `;
+        document.querySelector("main").appendChild(account);
+        document.querySelector("#sign-out-home").addEventListener("click", async () => {
+          await connectSupabase.auth.signOut();
+          window.location.reload();
+        });
       }
     });
   </script>

@@ -1,0 +1,1 @@
+document.querySelector("form").addEventListener("submit",e=>{e.preventDefault();alert("Connect authentication is not connected to a database yet. Next we'll add secure account storage with Supabase.");});

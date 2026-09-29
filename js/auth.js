@@ -40,7 +40,6 @@ if (form) {
           window.location.href = "index.html";
         } else {
           showMessage("Account created. Check your email to confirm your account, then sign in.", "success");
-          form.reset();
         }
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });

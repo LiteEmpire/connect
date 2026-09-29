@@ -47,6 +47,7 @@
   </main>
 
   <footer>© 2026 Connect. Built with HTML, CSS & JavaScript.</footer>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const connectSupabase = window.supabase.createClient(
@@ -54,15 +55,28 @@
       "sb_publishable_BONoTx6NCnML5GL_GGriGQ_XT2Rb1i6"
     );
 
-    connectSupabase.auth.getUser().then(({ data }) => {
-      const user = data.user;
-      const nav = document.querySelector(".nav nav");
-      const startButton = document.querySelector("#get-started .primary");
+    async function setupAuthenticatedHome() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get("code");
 
-      if (user) {
+        if (code) {
+          const { error } = await connectSupabase.auth.exchangeCodeForSession(code);
+          if (error) throw error;
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        const { data: { session } } = await connectSupabase.auth.getSession();
+        const user = session?.user;
+        if (!user) return;
+
         const username = user.user_metadata?.username || "Account";
-        nav.querySelector(".nav-button").textContent = username;
-        nav.querySelector(".nav-button").href = "#account";
+        const nav = document.querySelector(".nav nav");
+        const navButton = nav.querySelector(".nav-button");
+        const startButton = document.querySelector("#get-started .primary");
+
+        navButton.textContent = username;
+        navButton.href = "#account";
         startButton.textContent = "My Account";
         startButton.href = "#account";
 
@@ -72,20 +86,32 @@
         account.innerHTML = `
           <article>
             <strong>👤</strong>
-            <h2>${username}</h2>
-            <p>${user.email}</p>
+            <h2></h2>
+            <p></p>
             <button class="button secondary" id="sign-out-home" type="button">Sign Out</button>
           </article>
           <article><strong>💬</strong><h2>Messages</h2><p>Direct messaging is coming next.</p></article>
           <article><strong>👥</strong><h2>Friends</h2><p>Friend connections are coming next.</p></article>
         `;
+
+        account.querySelector("h2").textContent = username;
+        account.querySelector("p").textContent = user.email || "";
         document.querySelector("main").appendChild(account);
+
         document.querySelector("#sign-out-home").addEventListener("click", async () => {
           await connectSupabase.auth.signOut();
           window.location.reload();
         });
+      } catch (error) {
+        console.error("Connect auth callback error:", error);
       }
+    }
+
+    connectSupabase.auth.onAuthStateChange(() => {
+      setupAuthenticatedHome();
     });
+
+    setupAuthenticatedHome();
   </script>
   <script src="js/main.js"></script>
 </body>

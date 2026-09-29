@@ -1,4 +1,4 @@
-const supabase = window.connectSupabase;
+const authClient = window.connectSupabase;
 const form = document.querySelector("form");
 const message = document.querySelector("#auth-message");
 
@@ -27,7 +27,7 @@ if (form) {
           throw new Error("Username must be 3–20 characters and use only letters, numbers, or underscores.");
         }
 
-        const { data, error } = await supabase.auth.signUp({
+        const { data, error } = await authClient.auth.signUp({
           email,
           password,
           options: {
@@ -44,7 +44,7 @@ if (form) {
           showMessage("Account created. Check your email to confirm your account, then sign in.", "success");
         }
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { error } = await authClient.auth.signInWithPassword({ email, password });
         if (error) throw error;
         window.location.href = "index.html";
       }

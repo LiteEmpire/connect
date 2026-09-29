@@ -21,17 +21,23 @@ if (form) {
 
       if (isSignup) {
         const username = form.querySelector("input[name='username']").value.trim();
+        if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
+          throw new Error("Username must be 3–20 characters and use only letters, numbers, or underscores.");
+        }
+
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             data: { username },
-            emailRedirectTo: window.location.origin + "/connect/app.html"
+            emailRedirectTo: window.location.origin + "/connect/"
           }
         });
+
         if (error) throw error;
+
         if (data.session) {
-          window.location.href = "app.html";
+          window.location.href = "index.html";
         } else {
           showMessage("Account created. Check your email to confirm your account, then sign in.", "success");
           form.reset();
@@ -39,7 +45,7 @@ if (form) {
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        window.location.href = "app.html";
+        window.location.href = "index.html";
       }
     } catch (error) {
       showMessage(error.message || "Something went wrong.");
